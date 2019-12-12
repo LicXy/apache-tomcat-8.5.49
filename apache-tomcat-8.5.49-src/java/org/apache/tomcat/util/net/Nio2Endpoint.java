@@ -564,7 +564,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             //初始化回调类readCompletionHandler
             this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
                 /**
-                 * 当数据到达后，内核已经把数据拷贝到 Http11Processor 指定的 Buffer 里，
                  * 同时回调类 readCompletionHandler 被调用，在这个回调处理方法里会重
                  * 新创建一个新的 SocketProcessor 任务来继续处理这个连接，而这个新的
                  * SocketProcessor 任务类持有原来那个 Nio2SocketWrapper

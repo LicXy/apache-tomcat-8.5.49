@@ -1073,12 +1073,16 @@ public abstract class AbstractEndpoint<S> {
                 return false;
             }
             SocketProcessorBase<S> sc = processorCache.pop();
+            /**
+             * 在初始化或重置SocketProcessorBase时将socketWrapper交由其维护
+             */
             if (sc == null) {
                 sc = createSocketProcessor(socketWrapper, event);
             } else {
                 sc.reset(socketWrapper, event);
             }
-            //获取到一个工作线程, 如果获取到则使用该线程进行处理, 如果获取不到则使用当前线程处理
+
+            //尝试获取一个工作线程, 如果获取到则使用该线程进行处理, 如果获取不到则使用当前线程处理
             Executor executor = getExecutor();
             /**
              * {@link SocketProcessorBase#run()}

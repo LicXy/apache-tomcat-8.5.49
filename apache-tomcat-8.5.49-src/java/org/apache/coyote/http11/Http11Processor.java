@@ -890,6 +890,9 @@ public class Http11Processor extends AbstractProcessor {
             } else {
                 if (openSocket) {
                     if (readComplete) {
+                        /**
+                         * Nio2模型从这里返回, 第一次尝试读取socket失败
+                         */
                         return SocketState.OPEN;
                     } else {
                         return SocketState.LONG;
