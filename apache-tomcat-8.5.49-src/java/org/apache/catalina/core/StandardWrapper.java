@@ -982,6 +982,9 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public synchronized void load() throws ServletException {
+        /**
+         * 加载Servlet
+         */
         instance = loadServlet();
 
         if (!instanceInitialized) {
@@ -1020,7 +1023,7 @@ public class StandardWrapper extends ContainerBase
      */
     public synchronized Servlet loadServlet() throws ServletException {
 
-        // Nothing to do if we already have an instance or an instance pool
+        // 如果我们已经有实例或实例池，则无需执行任何操作
         if (!singleThreadModel && (instance != null))
             return instance;
 
@@ -1041,6 +1044,9 @@ public class StandardWrapper extends ContainerBase
 
             InstanceManager instanceManager = ((StandardContext)getParent()).getInstanceManager();
             try {
+                /**
+                 * 实例化Servlet
+                 */
                 servlet = (Servlet) instanceManager.newInstance(servletClass);
             } catch (ClassCastException e) {
                 unavailable(null);
@@ -1087,7 +1093,9 @@ public class StandardWrapper extends ContainerBase
                 }
                 singleThreadModel = true;
             }
-
+            /**
+             * 初始化servlet
+             */
             initServlet(servlet);
 
             fireContainerEvent("load", this);
@@ -1123,12 +1131,15 @@ public class StandardWrapper extends ContainerBase
 
         if (instanceInitialized && !singleThreadModel) return;
 
-        // Call the initialization method of this servlet
+        // 调用此Servlet的初始化方法
         try {
             if( Globals.IS_SECURITY_ENABLED) {
                 boolean success = false;
                 try {
                     Object[] args = new Object[] { facade };
+                    /**
+                     * 通过反射执行该Servlet的init()方法
+                     */
                     SecurityUtil.doAsPrivilege("init",
                                                servlet,
                                                classType,
