@@ -931,6 +931,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             /**
              * 由startStopExecutor线程通过调用LifecycleBase#start()去启动子容器
              * {@link StartChild#call()}
+             * Engine启动子容器Host是通过此方法启动的, 但是Context并不是通过此处启动的
              */
             results.add(startStopExecutor.submit(new StartChild(children[i])));
         }

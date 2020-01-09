@@ -5059,7 +5059,9 @@ public class StandardContext extends ContainerBase
                     context.setAttribute(Globals.CREDENTIAL_HANDLER, safeHandler);
                 }
 
-                // Notify our interested LifecycleListeners
+                /**
+                 * Notify our interested LifecycleListeners   <==重点
+                 */
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
