@@ -305,6 +305,9 @@ public class HostConfig implements LifecycleListener {
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.START_EVENT)) {
+            /**
+             *
+             */
             start();
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();

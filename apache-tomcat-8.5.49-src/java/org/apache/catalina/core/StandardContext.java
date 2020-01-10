@@ -5068,7 +5068,7 @@ public class StandardContext extends ContainerBase
                 for (Container child : findChildren()) {
                     if (!child.getState().isAvailable()) {
                         /**
-                         * 启动wrapper
+                         * 启动子容器
                          * {@link Lifecycle#start()}
                          */
                         child.start();
