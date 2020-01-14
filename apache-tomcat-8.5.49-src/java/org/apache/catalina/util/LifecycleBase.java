@@ -180,7 +180,7 @@ public abstract class LifecycleBase implements Lifecycle {
             return;
         }
         /**
-         * 根据this的状态,执行指定的操作(如: this为StandardHost时,此处将执行init()方法去初始化Standard)
+         * 根据this的状态,执行指定的操作(如: this为StandardHost时,此处将执行init()方法去初始化StandardContext)
          */
         if (state.equals(LifecycleState.NEW)) {
             init();

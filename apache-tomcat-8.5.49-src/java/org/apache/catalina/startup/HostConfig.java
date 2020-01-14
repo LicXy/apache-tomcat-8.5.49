@@ -419,20 +419,24 @@ public class HostConfig implements LifecycleListener {
      * in our "application root" directory.
      */
     protected void deployApps() {
-
+        //获取webapps目录路径(绝对路径)
         File appBase = host.getAppBaseFile();
+        //获取配置文件路径
         File configBase = host.getConfigBaseFile();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         /**
-         * Deploy XML descriptors from configBase
+         * 从基础配置信息中配置XML,描述信息
+         * {@link DeployDescriptor}
          */
         deployDescriptors(configBase, configBase.list());
         /**
-         * Deploy WARs
+         * 部署war包
+         * {@link DeployWar}
          */
         deployWARs(appBase, filteredAppPaths);
         /**
-         * Deploy expanded folders
+         * 部署扩展文件夹
+         * {@link DeployDirectory}
          */
         deployDirectories(appBase, filteredAppPaths);
 
@@ -517,8 +521,9 @@ public class HostConfig implements LifecycleListener {
 
         if (files == null)
             return;
-
+        //获取Host容器的线程池
         ExecutorService es = host.getStartStopExecutor();
+        //results集合用于存储线程执行后返回的结果
         List<Future<?>> results = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
@@ -529,9 +534,10 @@ public class HostConfig implements LifecycleListener {
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
-
-                results.add(
-                        es.submit(new DeployDescriptor(this, cn, contextXml)));
+                /**
+                 * 创建任务提交到线程池中执行
+                 */
+                results.add(es.submit(new DeployDescriptor(this, cn, contextXml)));
             }
         }
 
@@ -754,14 +760,15 @@ public class HostConfig implements LifecycleListener {
                     continue;
                 }
 
-                // Check for WARs with /../ /./ or similar sequences in the name
+                //检查名称中带有/../ /./或类似序列的WAR
                 if (!validateContextPath(appBase, cn.getBaseName())) {
-                    log.error(sm.getString(
-                            "hostConfig.illegalWarName", files[i]));
+                    log.error(sm.getString("hostConfig.illegalWarName", files[i]));
                     invalidWars.add(files[i]);
                     continue;
                 }
-
+                /**
+                 * 交由线程池去部署War包
+                 */
                 results.add(es.submit(new DeployWar(this, cn, war)));
             }
         }
@@ -1038,11 +1045,14 @@ public class HostConfig implements LifecycleListener {
                 continue;
             File dir = new File(appBase, files[i]);
             if (dir.isDirectory()) {
+                //获取上下文名称即项目根目录名称
                 ContextName cn = new ContextName(files[i], false);
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
-
+                /**
+                 * 创建任务,提交到线程池去执行
+                 */
                 results.add(es.submit(new DeployDirectory(this, cn, dir)));
             }
         }
@@ -1073,12 +1083,13 @@ public class HostConfig implements LifecycleListener {
             log.info(sm.getString("hostConfig.deployDir",
                     dir.getAbsolutePath()));
         }
-
+        /**
+         * 声明Context容器实例, 后面根据项目进行初始化
+         */
         Context context = null;
-        File xml = new File(dir, Constants.ApplicationContextXml);
-        File xmlCopy =
-                new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
 
+        File xml = new File(dir, Constants.ApplicationContextXml);
+        File xmlCopy = new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
 
         DeployedApplication deployedApp;
         boolean copyThisXml = isCopyXML();
@@ -1120,17 +1131,27 @@ public class HostConfig implements LifecycleListener {
                         cn.getPath(), xml, xmlCopy));
                 context = new FailedContext();
             } else {
+                /**
+                 * 初始化StandardContext实例
+                 */
                 context = (Context) Class.forName(contextClass).getConstructor().newInstance();
             }
-
+            /**
+             * 初始化ContextConfig实例,用于Context容器的生命周期监听
+             */
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
+            //将监听器添加到Context实例中
             context.addLifecycleListener(listener);
 
             context.setName(cn.getName());
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName());
+            /**
+             * 向Host容器添加子容器Context
+             * {@link StandardHost#addChild(org.apache.catalina.Container)}
+             */
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

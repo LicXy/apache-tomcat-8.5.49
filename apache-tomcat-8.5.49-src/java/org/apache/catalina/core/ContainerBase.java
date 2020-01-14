@@ -712,11 +712,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public void addChild(Container child) {
+        //判断是否开启安全性验证
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<Void> dp =
-                new PrivilegedAddChild(child);
+            PrivilegedAction<Void> dp = new PrivilegedAddChild(child);
             AccessController.doPrivileged(dp);
         } else {
+            /**
+             * 添加子容器
+             */
             addChildInternal(child);
         }
     }
@@ -734,13 +737,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             children.put(child.getName(), child);
         }
 
-        // Start child
+        /**
+         * 启动子容器
+         */
         // Don't do this inside sync block - start can be a slow process and
         // locking the children object can cause problems elsewhere
         try {
-            if ((getState().isAvailable() ||
-                    LifecycleState.STARTING_PREP.equals(getState())) &&
-                    startChildren) {
+            if ((getState().isAvailable() || LifecycleState.STARTING_PREP.equals(getState())) && startChildren) {
+                /**
+                 * {@link LifecycleBase#start()}
+                 */
                 child.start();
             }
         } catch (LifecycleException e) {

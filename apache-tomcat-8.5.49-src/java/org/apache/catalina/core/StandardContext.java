@@ -102,11 +102,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
-import org.apache.catalina.util.CharsetMapper;
-import org.apache.catalina.util.ContextName;
-import org.apache.catalina.util.ErrorPageSupport;
-import org.apache.catalina.util.ExtensionValidator;
-import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.util.*;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -5035,7 +5031,9 @@ public class StandardContext extends ContainerBase
                 // too early, so it should be reset.
                 logger = null;
                 getLogger();
-
+                /**
+                 * 启动Realm
+                 */
                 Realm realm = getRealmInternal();
                 if(null != realm) {
                     if (realm instanceof Lifecycle) {
@@ -5060,28 +5058,32 @@ public class StandardContext extends ContainerBase
                 }
 
                 /**
-                 * Notify our interested LifecycleListeners   <==重点
+                 * 通知相应监听器   <==重点
                  */
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
-                // Start our child containers, if not already started
+                /**
+                 * 对于还没有启动的子容器, 遍历启动
+                 * 注意: Wrapper不是这个时候启动的,是在通知监听器后, 由ContextConfig触发启动的
+                 */
                 for (Container child : findChildren()) {
                     if (!child.getState().isAvailable()) {
                         /**
                          * 启动子容器
-                         * {@link Lifecycle#start()}
+                         * {@link LifecycleBase#start()}
                          */
                         child.start();
                     }
                 }
 
-                // Start the Valves in our pipeline (including the basic),
-                // if any
+                /**
+                 * 启动pipeline中的valve(包括基本管道)
+                 */
                 if (pipeline instanceof Lifecycle) {
                     ((Lifecycle) pipeline).start();
                 }
 
-                // Acquire clustered manager
+                //获取集群管理器
                 Manager contextManager = null;
                 Manager manager = getManager();
                 if (manager == null) {
@@ -5102,7 +5104,7 @@ public class StandardContext extends ContainerBase
                     }
                 }
 
-                // Configure default manager if none was specified
+                // 如果未指定，则配置默认管理器
                 if (contextManager != null) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("standardContext.manager",
@@ -5123,7 +5125,9 @@ public class StandardContext extends ContainerBase
                 ok = false;
             }
 
-            // We put the resources into the servlet context
+            /**
+             * 将资源放入servlet上下文中
+             */
             if (ok)
                 getServletContext().setAttribute
                     (Globals.RESOURCES_ATTR, getResources());
@@ -5144,16 +5148,16 @@ public class StandardContext extends ContainerBase
                 InstanceManagerBindings.bind(getLoader().getClassLoader(), getInstanceManager());
             }
 
-            // Create context attributes that will be required
+            // 创建将需要的上下文属性
             if (ok) {
                 getServletContext().setAttribute(
                         JarScanner.class.getName(), getJarScanner());
             }
 
-            // Set up the context init params
+            // 设置上下文初始化参数
             mergeParameters();
 
-            // Call ServletContainerInitializers
+            // 调用ServletContainerInitializers
             for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
                 initializers.entrySet()) {
                 try {
@@ -5166,7 +5170,7 @@ public class StandardContext extends ContainerBase
                 }
             }
 
-            // Configure and call application event listeners
+            // 配置和调用应用程序事件侦听器
             if (ok) {
                 if (!listenerStart()) {
                     log.error(sm.getString("standardContext.listenerFail"));
@@ -5182,7 +5186,7 @@ public class StandardContext extends ContainerBase
             }
 
             try {
-                // Start manager
+                // 启动集群管理器
                 Manager manager = getManager();
                 if (manager instanceof Lifecycle) {
                     ((Lifecycle) manager).start();
@@ -5192,7 +5196,7 @@ public class StandardContext extends ContainerBase
                 ok = false;
             }
 
-            // Configure and call application filters
+            // 配置和调用应用程序过滤器
             if (ok) {
                 if (!filterStart()) {
                     log.error(sm.getString("standardContext.filterFail"));
@@ -5200,7 +5204,9 @@ public class StandardContext extends ContainerBase
                 }
             }
 
-            // Load and initialize all "load on startup" servlets
+            /**
+             * 加载并初始化所有“启动时加载” servlet
+             */
             if (ok) {
                 if (!loadOnStartup(findChildren())){
                     log.error(sm.getString("standardContext.servletFail"));
@@ -5208,14 +5214,14 @@ public class StandardContext extends ContainerBase
                 }
             }
 
-            // Start ContainerBackgroundProcessor thread
+            // 启动ContainerBackgroundProcessor线程
             super.threadStart();
         } finally {
             // Unbinding thread
             unbindThread(oldCCL);
         }
 
-        // Set available status depending upon startup success
+        // 根据启动成功设置可用状态
         if (ok) {
             if (log.isDebugEnabled())
                 log.debug("Starting completed");
@@ -5223,7 +5229,7 @@ public class StandardContext extends ContainerBase
             log.error(sm.getString("standardContext.startFailed", getName()));
         }
 
-        startTime=System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
 
         // Send j2ee.state.running notification
         if (ok && (this.getObjectName() != null)) {

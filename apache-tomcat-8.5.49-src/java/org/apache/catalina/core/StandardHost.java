@@ -687,21 +687,31 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     public void addChild(Container child) {
-
+        /**
+         * 如果子容器不是Context,则抛出异常
+         */
         if (!(child instanceof Context))
             throw new IllegalArgumentException
                 (sm.getString("standardHost.notContext"));
-
+        /**
+         * 给Context 添加监听器MemoryLeakTrackingListener
+         * 该监听器用于记录上下文启动时保留有关使用类加载器的记录
+         */
         child.addLifecycleListener(new MemoryLeakTrackingListener());
 
-        // Avoid NPE for case where Context is defined in server.xml with only a
-        // docBase
+        // Avoid NPE for case where Context is defined in server.xml with only a docBase
+        /**
+         * 如果没有在server.xml中配置上下文路径, 则使用项目根目录作为上下文路径
+         */
         Context context = (Context) child;
         if (context.getPath() == null) {
             ContextName cn = new ContextName(context.getDocBase(), true);
             context.setPath(cn.getPath());
         }
-
+        /**
+         * 调用父类ContainerBase的addChild()方法添加在容器
+         * {@link ContainerBase#addChild(org.apache.catalina.Container)}
+         */
         super.addChild(child);
 
     }
