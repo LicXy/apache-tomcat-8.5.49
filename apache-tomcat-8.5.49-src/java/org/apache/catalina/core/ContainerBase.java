@@ -960,7 +960,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) pipeline).start();
         }
 
-        //生命周期监听
+        /**
+         * 生命周期监听
+         * (当this为Host时, 此时HostConfig会监听到Host容器启动完成事件, 将开始部署webapps)
+         */
         setState(LifecycleState.STARTING);
 
         //启动线程

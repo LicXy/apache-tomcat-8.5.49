@@ -306,7 +306,7 @@ public class HostConfig implements LifecycleListener {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.START_EVENT)) {
             /**
-             *
+             * 根据事件的类型执行不同的处理逻辑
              */
             start();
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
@@ -423,11 +423,17 @@ public class HostConfig implements LifecycleListener {
         File appBase = host.getAppBaseFile();
         File configBase = host.getConfigBaseFile();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
-        // Deploy XML descriptors from configBase
+        /**
+         * Deploy XML descriptors from configBase
+         */
         deployDescriptors(configBase, configBase.list());
-        // Deploy WARs
+        /**
+         * Deploy WARs
+         */
         deployWARs(appBase, filteredAppPaths);
-        // Deploy expanded folders
+        /**
+         * Deploy expanded folders
+         */
         deployDirectories(appBase, filteredAppPaths);
 
     }
@@ -1543,7 +1549,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Process a "start" event for this Host.
+     * 为Host容器处理start事件
      */
     public void start() {
 
@@ -1559,7 +1565,7 @@ public class HostConfig implements LifecycleListener {
         } catch (Exception e) {
             log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
-
+        //获取/webapps文件夹下所有的基础文件夹
         if (!host.getAppBaseFile().isDirectory()) {
             log.error(sm.getString("hostConfig.appBase", host.getName(),
                     host.getAppBaseFile().getPath()));
@@ -1568,6 +1574,9 @@ public class HostConfig implements LifecycleListener {
         }
 
         if (host.getDeployOnStartup())
+        /**
+         * 部署web应用
+         */
             deployApps();
 
     }

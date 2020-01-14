@@ -444,7 +444,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if XML context descriptors should be deployed.
+     * @return <code>true</code>是否应部署XML上下文描述符
      */
     public boolean isDeployXML() {
         return deployXML;
@@ -540,7 +540,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if WARs should be unpacked on deployment.
+     * @return <code>true</code> 是否应在部署时解压缩WAR
      */
     public boolean isUnpackWARs() {
         return unpackWARs;
