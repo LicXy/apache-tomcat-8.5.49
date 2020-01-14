@@ -1138,7 +1138,8 @@ public class StandardWrapper extends ContainerBase
                 try {
                     Object[] args = new Object[] { facade };
                     /**
-                     * 通过反射执行该Servlet的init()方法
+                     * 通过反射执行该Servlet的init()方法  <==== 重点
+                     * 对于SpringMvc中的DispatchServlet就是在此时触发初始化操作的
                      */
                     SecurityUtil.doAsPrivilege("init",
                                                servlet,

@@ -128,8 +128,8 @@ public abstract class LifecycleBase implements Lifecycle {
         for (LifecycleListener listener : lifecycleListeners) {
             /**
              * {@link EngineConfig#lifecycleEvent(LifecycleEvent)}
-             * {@link ContextConfig#lifecycleEvent(LifecycleEvent)}
              * {@link HostConfig#lifecycleEvent(LifecycleEvent)}
+             * {@link ContextConfig#lifecycleEvent(LifecycleEvent)}
              */
             listener.lifecycleEvent(event);
         }

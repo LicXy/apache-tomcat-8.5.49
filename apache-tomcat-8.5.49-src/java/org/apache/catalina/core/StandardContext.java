@@ -2837,7 +2837,9 @@ public class StandardContext extends ContainerBase
                 removeChild(oldJspServlet);
             }
         }
-
+        /**
+         * {@link ContainerBase#addChild(org.apache.catalina.Container)}
+         */
         super.addChild(child);
 
         if (isJspServlet && oldJspServlet != null) {
@@ -4857,8 +4859,9 @@ public class StandardContext extends ContainerBase
      * @return <code>true</code> if load on startup was considered successful
      */
     public boolean loadOnStartup(Container children[]) {
-
-        // Collect "load on startup" servlets that need to be initialized
+        /**
+         * 遍历Context中所有子容器, 收集需要初始化的“启动时加载” servlet
+         */
         TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
         for (int i = 0; i < children.length; i++) {
             Wrapper wrapper = (Wrapper) children[i];
@@ -4874,10 +4877,15 @@ public class StandardContext extends ContainerBase
             list.add(wrapper);
         }
 
-        // Load the collected "load on startup" servlets
+        /**
+         * 遍历加载 "启动时加载"Servlet
+         */
         for (ArrayList<Wrapper> list : map.values()) {
             for (Wrapper wrapper : list) {
                 try {
+                    /**
+                     * {@link StandardWrapper#load()}
+                     */
                     wrapper.load();
                 } catch (ServletException e) {
                     getLogger().error(sm.getString("standardContext.loadOnStartup.loadException",
@@ -5125,9 +5133,7 @@ public class StandardContext extends ContainerBase
                 ok = false;
             }
 
-            /**
-             * 将资源放入servlet上下文中
-             */
+            //将资源放入servlet上下文中
             if (ok)
                 getServletContext().setAttribute
                     (Globals.RESOURCES_ATTR, getResources());
@@ -5206,6 +5212,8 @@ public class StandardContext extends ContainerBase
 
             /**
              * 加载并初始化所有“启动时加载” servlet
+             * 注意: 对于SpringMvc中的DispatchServlet就是由此触发初始化操作的
+             * {@link StandardContext#loadOnStartup(org.apache.catalina.Container[]){
              */
             if (ok) {
                 if (!loadOnStartup(findChildren())){

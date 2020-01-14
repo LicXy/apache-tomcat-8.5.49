@@ -61,6 +61,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
@@ -295,8 +296,13 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        // Process the event that has occurred
+        /**
+         * 根据发生的事件执行不同的处理逻辑
+         */
         if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
+            /**
+             * 触发启动StandardWrapper容器
+             */
             configureStart();
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
@@ -766,7 +772,9 @@ public class ContextConfig implements LifecycleListener {
                     Boolean.valueOf(context.getXmlValidation()),
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
-
+        /**
+         * web.xml配置解析
+         */
         webConfig();
         context.addServletContainerInitializer(new JasperInitializer(),null);
         if (!context.getIgnoreAnnotations()) {
@@ -1154,6 +1162,9 @@ public class ContextConfig implements LifecycleListener {
 
             // Step 9. Apply merged web.xml to Context
             if (ok) {
+                /**
+                 * 配置Context上下文
+                 */
                 configureContext(webXml);
             }
         } else {
@@ -1323,7 +1334,13 @@ public class ContextConfig implements LifecycleListener {
         for (ContextService service : webxml.getServiceRefs().values()) {
             context.getNamingResources().addService(service);
         }
+        /**
+         * 遍历web.xml中所有的Servlet, 进行包装, 并添加到Context上下文中
+         */
         for (ServletDef servlet : webxml.getServlets().values()) {
+            /**
+             * 根据Servlet创建以及配置wrapper
+             */
             Wrapper wrapper = context.createWrapper();
             // Description is ignored
             // Display name is ignored
@@ -1370,8 +1387,13 @@ public class ContextConfig implements LifecycleListener {
                         servlet.getAsyncSupported().booleanValue());
             }
             wrapper.setOverridable(servlet.isOverridable());
+            /**
+             * 添加wrapper容器到Context中
+             * {@link StandardContext#addChild(org.apache.catalina.Container)}
+             */
             context.addChild(wrapper);
         }
+
         for (Entry<String, String> entry :
                 webxml.getServletMappings().entrySet()) {
             context.addServletMappingDecoded(entry.getKey(), entry.getValue());
