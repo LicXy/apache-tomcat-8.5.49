@@ -331,7 +331,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             socketWrapper.setSecure(isSSLEnabled());
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
-            //将socketWrapper包装交由工作线程继续处理
+            /**
+             * 将socketWrapper包装交由工作线程继续处理
+             */
             return processSocket(socketWrapper, SocketEvent.OPEN_READ, true);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
