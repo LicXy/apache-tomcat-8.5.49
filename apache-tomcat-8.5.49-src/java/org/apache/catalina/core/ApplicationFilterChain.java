@@ -163,6 +163,9 @@ public final class ApplicationFilterChain implements FilterChain {
                     throw new ServletException(e.getMessage(), e);
             }
         } else {
+            /**
+             * 执行过滤器链
+             */
             internalDoFilter(request,response);
         }
     }
@@ -171,7 +174,9 @@ public final class ApplicationFilterChain implements FilterChain {
                                   ServletResponse response)
         throws IOException, ServletException {
 
-        // Call the next filter if there is one
+        /**
+         * 1. 如果存在过滤器, 则执行该过滤器
+         */
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
             try {
@@ -202,7 +207,9 @@ public final class ApplicationFilterChain implements FilterChain {
             return;
         }
 
-        // We fell off the end of the chain -- call the servlet instance
+        /**
+         * 2. 调用链执行完成之后, 调用servlet的service()方法
+         */
         try {
             if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(request);
@@ -228,6 +235,9 @@ public final class ApplicationFilterChain implements FilterChain {
                                            args,
                                            principal);
             } else {
+                /**
+                 * 调用servlet的service方法;
+                 */
                 servlet.service(request, response);
             }
         } catch (IOException | ServletException | RuntimeException e) {

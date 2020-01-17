@@ -57,7 +57,9 @@ public final class ApplicationFilterFactory {
         if (servlet == null)
             return null;
 
-        // Create and initialize a filter chain object
+        /**
+         * 创建并初始化过滤器链对象
+         */
         ApplicationFilterChain filterChain = null;
         if (request instanceof Request) {
             Request req = (Request) request;
@@ -79,7 +81,9 @@ public final class ApplicationFilterFactory {
         filterChain.setServlet(servlet);
         filterChain.setServletSupportsAsync(wrapper.isAsyncSupported());
 
-        // Acquire the filter mappings for this Context
+        /**
+         * 获取此上下文的过滤器映射
+         */
         StandardContext context = (StandardContext) wrapper.getParent();
         FilterMap filterMaps[] = context.findFilterMaps();
 
@@ -99,7 +103,9 @@ public final class ApplicationFilterFactory {
 
         String servletName = wrapper.getName();
 
-        // Add the relevant path-mapped filters to this filter chain
+        /**
+         * 将相关的路径映射过滤器添加到此过滤器链
+         */
         for (int i = 0; i < filterMaps.length; i++) {
             if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
                 continue;

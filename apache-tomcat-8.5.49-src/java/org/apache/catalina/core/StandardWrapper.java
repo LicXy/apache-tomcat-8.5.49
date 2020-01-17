@@ -740,7 +740,7 @@ public class StandardWrapper extends ContainerBase
     @Override
     public Servlet allocate() throws ServletException {
 
-        // If we are currently unloading this servlet, throw an exception
+        //如果此时正在卸载servlet,则抛出异常
         if (unloading) {
             throw new ServletException(sm.getString("standardWrapper.unloading", getName()));
         }
@@ -749,7 +749,9 @@ public class StandardWrapper extends ContainerBase
 
         // If not SingleThreadedModel, return the same instance every time
         if (!singleThreadModel) {
-            // Load and initialize our instance if necessary
+            /**
+             * 如果实例未null或者还没有初始化完成, 则创建,以及初始化
+             */
             if (instance == null || !instanceInitialized) {
                 synchronized (this) {
                     if (instance == null) {
@@ -758,8 +760,12 @@ public class StandardWrapper extends ContainerBase
                                 log.debug("Allocating non-STM instance");
                             }
 
-                            // Note: We don't know if the Servlet implements
-                            // SingleThreadModel until we have loaded it.
+                            /**
+                             * 加载Servlet
+                             * 注意：(1)我们不知道Servlet是否实现SingleThreadModel，直到我们加载它。
+                             *       (2)此处调用loadServlet()方法加载Servlet是在接受到请求后,分配servlet处理请求时没有从缓存中获取到, 创建新的servlet实例后调用的
+                             *       此处要与StandardContext中监听事件中的调用的loadServlet()方法区分
+                             */
                             instance = loadServlet();
                             newInstance = true;
                             if (!singleThreadModel) {
@@ -780,7 +786,9 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             }
-
+            /**
+             * 将新创建的servlet实例放入实例池中
+             */
             if (singleThreadModel) {
                 if (newInstance) {
                     // Have to do this outside of the sync above to prevent a
@@ -791,6 +799,9 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             } else {
+                /**
+                 * 如果没有创建新servlet实例, 则直接返回获取到的实例
+                 */
                 if (log.isTraceEnabled()) {
                     log.trace("  Returning non-STM instance");
                 }
@@ -828,6 +839,9 @@ public class StandardWrapper extends ContainerBase
                 log.trace("  Returning allocated STM instance");
             }
             countAllocated.incrementAndGet();
+            /**
+             * 从实例池中返回一个servlet实例
+             */
             return instancePool.pop();
         }
     }
@@ -1045,7 +1059,7 @@ public class StandardWrapper extends ContainerBase
             InstanceManager instanceManager = ((StandardContext)getParent()).getInstanceManager();
             try {
                 /**
-                 * 实例化Servlet
+                 * 1.实例化Servlet
                  */
                 servlet = (Servlet) instanceManager.newInstance(servletClass);
             } catch (ClassCastException e) {
@@ -1094,7 +1108,7 @@ public class StandardWrapper extends ContainerBase
                 singleThreadModel = true;
             }
             /**
-             * 初始化servlet
+             * 2.初始化servlet;
              */
             initServlet(servlet);
 

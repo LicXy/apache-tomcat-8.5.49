@@ -62,7 +62,7 @@ final class StandardContextValve extends ValveBase {
     public final void invoke(Request request, Response response)
         throws IOException, ServletException {
 
-        // Disallow any direct access to resources under WEB-INF or META-INF
+        // 禁止直接访问WEB-INF或META-INF下的资源
         MessageBytes requestPathMB = request.getRequestPathMB();
         if ((requestPathMB.startsWithIgnoreCase("/META-INF/", 0))
                 || (requestPathMB.equalsIgnoreCase("/META-INF"))
@@ -72,14 +72,14 @@ final class StandardContextValve extends ValveBase {
             return;
         }
 
-        // Select the Wrapper to be used for this Request
+        // 选择用于此请求的包装器
         Wrapper wrapper = request.getWrapper();
         if (wrapper == null || wrapper.isUnavailable()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        // Acknowledge the request
+        // 确认请求
         try {
             response.sendAcknowledgement();
         } catch (IOException ioe) {

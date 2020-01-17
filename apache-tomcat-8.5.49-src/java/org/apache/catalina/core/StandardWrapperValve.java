@@ -128,11 +128,13 @@ final class StandardWrapperValve
             unavailable = true;
         }
 
-        // Allocate a servlet instance to process this request
+        /**
+         * 1.分配一个servlet实例以处理此请求
+         */
         try {
             if (!unavailable) {
                 /**
-                 * 1.实例化Servlet
+                 * 获取一个Servlet实例
                  */
                 servlet = wrapper.allocate();
             }
@@ -172,27 +174,24 @@ final class StandardWrapperValve
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);
         /**
-         *  2.给当前请求创建一个Filter链
+         * 2.给当前请求创建一个Filter链
          */
         ApplicationFilterChain filterChain =
                 ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
 
-        // Call the filter chain for this request
-        // NOTE: This also calls the servlet's service() method
+        /**
+         * 3.调用过滤器链, 在过滤器链的最后会调用servlet的service()方法
+         */
         try {
             if ((servlet != null) && (filterChain != null)) {
                 // Swallow output if needed
                 if (context.getSwallowOutput()) {
                     try {
                         SystemLogHandler.startCapture();
-                        if (request.isAsyncDispatching()) {
+                        if (request.isAsyncDispatching()) {  //如果是异步请求
                             request.getAsyncContextInternal().doInternalDispatch();
                         } else {
-                            /**
-                             * 3. 调用这个Filter链，Filter链中的最后一个Filter会调用Servlet
-                             */
-                            filterChain.doFilter(request.getRequest(),
-                                    response.getResponse());
+                            filterChain.doFilter(request.getRequest(),response.getResponse());
                         }
                     } finally {
                         String log = SystemLogHandler.stopCapture();
@@ -204,8 +203,10 @@ final class StandardWrapperValve
                     if (request.isAsyncDispatching()) {
                         request.getAsyncContextInternal().doInternalDispatch();
                     } else {
-                        filterChain.doFilter
-                            (request.getRequest(), response.getResponse());
+                        /**
+                         * 3.1 调用这个Filter链，Filter链中的最后一个Filter会调用Servlet
+                         */
+                        filterChain.doFilter(request.getRequest(), response.getResponse());
                     }
                 }
 
@@ -263,12 +264,12 @@ final class StandardWrapperValve
             exception(request, response, e);
         }
 
-        // Release the filter chain (if any) for this request
+        // 如果存在过滤器链,则释放此请求的过滤器链
         if (filterChain != null) {
             filterChain.release();
         }
 
-        // Deallocate the allocated servlet instance
+        // 取消分配已分配的servlet实例
         try {
             if (servlet != null) {
                 wrapper.deallocate(servlet);
