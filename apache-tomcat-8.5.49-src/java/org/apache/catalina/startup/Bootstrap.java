@@ -35,7 +35,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 /**
  *  Bootstrap中反射调用Catalina的意义
- *  因为Bootstrap这个类在Tomcat打包发布时是放在bin\bootstrap.jar中，
+ *  因为Bootstrap这个类在打包发布时是放在bin\bootstrap.jar中，
  *  而Catalina类是放在lib\catalina.jar中,两个jar是用不同的ClassLoader加载的，
  *  所以不能在Bootstrap类中直接引用Catalina类，只能通过反射。
  *  换句话说, 加载Catalina的类加载器,是不能加载ClassLoader的
@@ -77,7 +77,7 @@ public final class Bootstrap {
 
         if (homeFile == null) {
 
-            // 第一次回退。 查看当前目录是否为在普通的Tomcat安装中的bin目录
+            // 第一次回退。 查看当前目录是否为在普通的安装中的bin目录
             File bootstrapJar = new File(userDir, "bootstrap.jar");
 
             if (bootstrapJar.exists()) {
@@ -469,7 +469,7 @@ public final class Bootstrap {
 
 
     /**
-     * Main method and entry point when starting Tomcat via the provided
+     * Main method and entry point when starting  via the provided
      * scripts.
      *
      * @param args Command line arguments to be processed

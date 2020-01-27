@@ -1052,6 +1052,7 @@ public class HostConfig implements LifecycleListener {
                     continue;
                 /**
                  * 创建任务,提交到线程池去执行
+                 * {@link DeployDirectory#run()}
                  */
                 results.add(es.submit(new DeployDirectory(this, cn, dir)));
             }
@@ -1074,10 +1075,8 @@ public class HostConfig implements LifecycleListener {
      * @param dir The path to the root folder of the weapp
      */
     protected void deployDirectory(ContextName cn, File dir) {
-
-
         long startTime = 0;
-        // Deploy the application in this directory
+        //在此目录中部署应用程序
         if( log.isInfoEnabled() ) {
             startTime = System.currentTimeMillis();
             log.info(sm.getString("hostConfig.deployDir",
