@@ -299,7 +299,10 @@ public class CoyoteAdapter implements Adapter {
     @Override
     public void service(org.apache.coyote.Request req, org.apache.coyote.Response res)
             throws Exception {
-
+        /**
+         * 将coyote.Request强转为connector.Request;将coyote.Response强转为connector.Response
+         * 在强转为connector.Request后,request实例中存在mappingData属性, 用于存储适合该请求的Host,Context,Wrapper实例对象
+         */
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
@@ -332,8 +335,11 @@ public class CoyoteAdapter implements Adapter {
         req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
 
         try {
-            // Parse and set Catalina and configuration specific
-            // request parameters
+            /**
+             *  =============== 重点 ==================
+             * 解析并设置Catalina和特定于配置请求参数
+             * 也就是在此处根据请求信息将制定的Host,Context,Wrapper实例对象封装到request实例中
+             */
             postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
@@ -695,9 +701,11 @@ public class CoyoteAdapter implements Adapter {
         }
 
         while (mapRequired) {
-            // This will map the the latest version by default
-            connector.getService().getMapper().map(serverName, decodedURI,
-                    version, request.getMappingData());
+            /**
+             * 默认情况下，它将映射最新版本
+             * 根据请求信息,映射对应的Host, Context和Wrapper容器
+             */
+            connector.getService().getMapper().map(serverName, decodedURI, version, request.getMappingData());
 
             // If there is no context at this point, either this is a 404
             // because no ROOT context has been deployed or the URI was invalid

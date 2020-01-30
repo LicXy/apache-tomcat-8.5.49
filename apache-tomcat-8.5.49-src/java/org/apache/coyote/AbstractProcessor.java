@@ -77,6 +77,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected final UserDataHelper userDataHelper;
 
     public AbstractProcessor(AbstractEndpoint<?> endpoint) {
+        /**
+         * 在创建抽象处理器时,创建coyote.Request和coyote.Response实例, 用于封装请求和返回数据
+         */
         this(endpoint, new Request(), new Response());
     }
 

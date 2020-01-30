@@ -35,6 +35,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.Http11Processor;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
@@ -812,8 +813,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 }
                 if (processor == null) {
                     /**
-                     * 创建Http11Processor处理器
+                     * 创建Http11Processor处理器  <==重点
                      * processor ==> {@link Http11Processor}
+                     * {@link AbstractHttp11Protocol#createProcessor()}
                      */
                     processor = getProtocol().createProcessor();
                     register(processor);

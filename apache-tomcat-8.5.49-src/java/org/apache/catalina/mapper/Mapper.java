@@ -695,8 +695,10 @@ public final class Mapper {
         }
         host.toChars();
         uri.toChars();
-        internalMap(host.getCharChunk(), uri.getCharChunk(), version,
-                mappingData);
+        /**
+         * 重点
+         */
+        internalMap(host.getCharChunk(), uri.getCharChunk(), version, mappingData);
     }
 
 
